@@ -1,14 +1,21 @@
-import React, { Component, useState } from "react";
+import React from "react";
 import axios from "axios";
 import styles from "./styles.module.css";
-export default class MovieCard extends Component {
-  constructor() {
-    super();
+
+export default class MovieCard extends React.Component {
+  constructor(props) {
+    console.log("MovieCard - constructor");
+    super(props);
+    this.query = this.props.movieQuery;
     this.state = {
       moviesResponse: {},
+      input: " ",
+      filterData: {},
     };
   }
+
   componentDidMount() {
+    console.log("MovieCard - componentDidMount");
     axios
       .get(
         "https://api.themoviedb.org/3/movie/popular?api_key=cfe422613b250f702980a3bbf9e90716"
@@ -20,7 +27,36 @@ export default class MovieCard extends Component {
         });
       });
   }
+  componentDidUpdate() {
+    console.log("MovieCard - componentDidUpdate");
+    if (this.props.movieQuery.length > 0) {
+      axios
+        .get(
+          "https://api.themoviedb.org/3/search/movie?api_key=cfe422613b250f702980a3bbf9e90716" +
+            "&query=" +
+            this.props.movieQuery
+        )
+        .then((res) => {
+          const moviesResponse = res.data;
+          this.setState({
+            moviesResponse,
+          });
+        });
+    } else {
+      axios
+        .get(
+          "https://api.themoviedb.org/3/movie/popular?api_key=cfe422613b250f702980a3bbf9e90716"
+        )
+        .then((res) => {
+          const moviesResponse = res.data;
+          this.setState({
+            moviesResponse,
+          });
+        });
+    }
+  }
   render() {
+    console.log("MovieCard - render");
     return (
       <div className={styles.CardDiv}>
         {this.state.moviesResponse?.results?.map((movie) => (
